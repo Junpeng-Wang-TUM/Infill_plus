@@ -1,10 +1,14 @@
 % Function: Infill optimization
 % Author: Jun Wu (j.wu-1@tudelft.nl)
 % Version: 2017-06-19
+% Adapted by Junpeng Wang (junpeng.wang@tum.de)
+% Date: 2021-08-05
 
-% Example Infill(200,100,[2],500) or Infill(200,100,[1,2],400)
+% Example: 
+%	Original (without preprocess): Infill(200,100,[2],500,0)
+%	New (with preprocess): Infill(200,100,[2],500,1)
 
-function Infill(nelx,nely,mdof,nloop)
+function Infill(nelx,nely,mdof,nloop,preprocessOpt)
 %mdof[1,2]
 % 1 total volume
 % 2 upper bound
@@ -39,7 +43,7 @@ edofMat = repmat(edofVec,1,8)+repmat([0 1 2*nely+[2 3 0 1] -2 -1],nelx*nely,1);
 iK = reshape(kron(edofMat,ones(8,1))',64*nelx*nely,1);
 jK = reshape(kron(edofMat,ones(1,8))',64*nelx*nely,1);
 % DEFINE LOADS AND SUPPORTS (HALF MBB-BEAM)
-iLoad = 3;
+iLoad = 5;
 Fsparse = sparse(2*(nely+1)*(nelx+1),1);
 if iLoad == 0
     Fsparse(2*nelx*(nely+1)+2*(nely/2)+2,1) = -1;
