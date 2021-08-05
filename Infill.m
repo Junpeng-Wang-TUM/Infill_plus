@@ -10,7 +10,8 @@ function Infill(nelx,nely,mdof,nloop)
 % 2 upper bound
 
 close all;
-mkdir('images');
+%mkdir('images');
+if ~exist('images', 'dir'), mkdir('images'); end
 volfrac = 0.3;
 vol_max = 0.6;
 penal = 3;      % stiffness penalty
