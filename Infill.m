@@ -107,6 +107,19 @@ LF = chol(KF,'lower');
 
 %% INITIALIZE ITERATION
 x = repmat(volfrac,nely,nelx);
+
+%% STRESS TENSOR TOPOLOGY BASED PRE-PROCESS
+if preprocessOpt
+    sK = reshape(KE(:)*(Emin+ones(1,nelx*nely).^penal*(E0-Emin)),64*nelx*nely,1);
+    K = sparse(iK,jK,sK); K = (K+K')/2; 
+    U(freedofs) = K(freedofs,freedofs)\Fsparse(freedofs);
+	thickness = 2;
+	preEmbeddedElements = TensorTopoBasedPreProcess(U,nelx,nely,edofMat,E0,nu,thickness);
+	x(preEmbeddedElements) = 1;
+	
+	figure; colormap(gray); imagesc(-x, [-1 0]); axis equal; axis tight; axis off; drawnow;
+	return;
+end
 xTilde = x;
 xPhys = (tanh(beta*eta) + tanh(beta*(xTilde-eta))) / (tanh(beta*eta) + tanh(beta*(1-eta)));
 xold1 = reshape(x,[nely*nelx,1]);
