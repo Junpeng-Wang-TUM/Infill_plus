@@ -15,13 +15,14 @@ function Infill(nelx,nely,mdof,nloop,preprocessOpt)
 
 close all;
 %mkdir('images');
-if ~exist('images', 'dir'), mkdir('images'); end
+if ~exist('./images', 'dir'), mkdir('images'); end
 volfrac = 0.3;
 vol_max = 0.6;
 penal = 3;      % stiffness penalty
 p = 16;         % pNorm
 r_hat = 6;      % pNorm radius
-rmin = 1.6;     % density filter radius
+%rmin = 1.6;     % density filter radius
+rmin = max(1.6, r_hat/4); % density filter radius
 move = 0.01;    % limited move for the design variables
 beta = 1;       % beta continuation
 eta = 0.5;      % projection threshold, fixed at 0.5
@@ -107,7 +108,6 @@ LF = chol(KF,'lower');
 
 %% INITIALIZE ITERATION
 x = repmat(volfrac,nely,nelx);
-
 %% STRESS TENSOR TOPOLOGY BASED PRE-PROCESS
 if preprocessOpt
     sK = reshape(KE(:)*(Emin+ones(1,nelx*nely).^penal*(E0-Emin)),64*nelx*nely,1);
@@ -116,9 +116,6 @@ if preprocessOpt
 	thickness = 2;
 	preEmbeddedElements = TensorTopoBasedPreProcess(U,nelx,nely,edofMat,E0,nu,thickness);
 	x(preEmbeddedElements) = 1;
-	
-	figure; colormap(gray); imagesc(-x, [-1 0]); axis equal; axis tight; axis off; drawnow;
-	return;
 end
 xTilde = x;
 xPhys = (tanh(beta*eta) + tanh(beta*(xTilde-eta))) / (tanh(beta*eta) + tanh(beta*(1-eta)));
