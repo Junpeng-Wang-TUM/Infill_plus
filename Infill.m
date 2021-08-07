@@ -5,10 +5,10 @@
 % Date: 2021-08-05
 
 % Example: 
-%	Original (without preprocess): Infill(200,100,[2],500,0)
-%	New (with preprocess): Infill(200,100,[2],500,1)
+%	Original (without preprocess): Infill(500,250,[2],1000,0)
+%	New (with preprocess): Infill(500,250,[2],1000,1)
 
-function Infill(nelx,nely,mdof,nloop,preprocessOpt)
+function [c_hist, vol_hist, change_hist, sharp_hist, cons_hist] = Infill(nelx,nely,mdof,nloop,preprocessOpt)
 %mdof[1,2]
 % 1 total volume
 % 2 upper bound
@@ -16,11 +16,11 @@ function Infill(nelx,nely,mdof,nloop,preprocessOpt)
 close all;
 %mkdir('images');
 if ~exist('./images', 'dir'), mkdir('images'); end
-volfrac = 0.3;
+volfrac = 0.5;
 vol_max = 0.6;
 penal = 3;      % stiffness penalty
 p = 16;         % pNorm
-r_hat = 6;      % pNorm radius
+r_hat = 18;      % pNorm radius
 %rmin = 1.6;     % density filter radius
 rmin = max(1.6, r_hat/4); % density filter radius
 move = 0.01;    % limited move for the design variables
@@ -30,7 +30,7 @@ vol_max_pNorm = (nelx*nely*vol_max^p)^(1/p);
 
 %% MATERIAL PROPERTIES
 E0 = 1;
-Emin = 1e-9;
+Emin = 1e-6;
 nu = 0.3;
 %% PREPARE FINITE ELEMENT ANALYSIS
 A11 = [12  3 -6 -3;  3 12  3  0; -6  3 12 -3; -3  0 -3 12];
@@ -113,7 +113,7 @@ if preprocessOpt
     sK = reshape(KE(:)*(Emin+ones(1,nelx*nely).^penal*(E0-Emin)),64*nelx*nely,1);
     K = sparse(iK,jK,sK); K = (K+K')/2; 
     U(freedofs) = K(freedofs,freedofs)\Fsparse(freedofs);
-	thickness = 2;
+	thickness = 2; %%thickness of the pre-embedded element bands
 	preEmbeddedElements = TensorTopoBasedPreProcess(U,nelx,nely,edofMat,E0,nu,thickness);
 	x(preEmbeddedElements) = 1;
 end
@@ -135,7 +135,6 @@ vol_hist = zeros(nloop,1);      % volume
 change_hist = zeros(nloop,1);   % maximum design change
 sharp_hist = zeros(nloop,1);    % sharpness
 cons_hist = zeros(nloop,2);     % constraints
-
 
 while change > 0.0001 && loop < nloop
     loopbeta = loopbeta+1;
@@ -187,7 +186,8 @@ while change > 0.0001 && loop < nloop
     fval = zeros(2,1);
     fval(1,1) = sum(sum(xPhys)) / (nelx*nely*volfrac) - 1;
     fval(2,1) = (sum(x_pde_hat.^p))^(1/p)- vol_max_pNorm;
-    
+    sensitivityField_ = -df0dx(:) ./ dfdx(mdof,:)';
+	
     a0 = 1;
     a = zeros(m,1);     
     c_ = ones(m,1)*1000;
@@ -234,6 +234,14 @@ while change > 0.0001 && loop < nloop
 
     filename1 = sprintf('images\\rho-It%i.png',loop);
     saveas(1,filename1,'png');
+
+	% if 0==mod(loop,50)
+		% densityField_ = reshape(xPhys, numel(xPhys), 1);	
+		% fileName = sprintf(strcat('./images/', 'materialFiled-It-%d.mat'), loop);
+		% save(fileName, 'densityField_');
+		% fileName = sprintf(strcat('./images/', 'sensitivityField-It-%d.mat'), loop);
+		% save(fileName, 'sensitivityField_');	
+	% end
 end
 
 
