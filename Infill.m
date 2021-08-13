@@ -6,7 +6,7 @@
 
 % Example: 
 %	Original (without preprocess): Infill(500,250,[2],1000,0)
-%	New (with preprocess): Infill(500,250,[2],1000,1)
+%	New (with topology-guided preprocess): Infill(500,250,[2],1000,1)
 
 function [c_hist, vol_hist, change_hist, sharp_hist, cons_hist] = Infill(nelx,nely,mdof,nloop,preprocessOpt)
 %mdof[1,2]
