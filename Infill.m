@@ -21,8 +21,8 @@ vol_max = 0.6;
 penal = 3;      % stiffness penalty
 p = 16;         % pNorm
 r_hat = 18;      % pNorm radius
-%rmin = 1.6;     % density filter radius
-rmin = max(1.6, r_hat/4); % density filter radius
+rmin = 4.5;     % density filter radius
+%rmin = max(1.6, r_hat/4); % density filter radius
 move = 0.01;    % limited move for the design variables
 beta = 1;       % beta continuation
 eta = 0.5;      % projection threshold, fixed at 0.5
@@ -235,13 +235,13 @@ while change > 0.0001 && loop < nloop
     filename1 = sprintf('images\\rho-It%i.png',loop);
     saveas(1,filename1,'png');
 
-	% if 0==mod(loop,50)
-		% densityField_ = reshape(xPhys, numel(xPhys), 1);	
-		% fileName = sprintf(strcat('./images/', 'materialFiled-It-%d.mat'), loop);
-		% save(fileName, 'densityField_');
-		% fileName = sprintf(strcat('./images/', 'sensitivityField-It-%d.mat'), loop);
-		% save(fileName, 'sensitivityField_');	
-	% end
+% 	if 0==mod(loop,50)
+% 		densityField_ = reshape(xPhys, numel(xPhys), 1);	
+% 		fileName = sprintf(strcat('./images/', 'materialFiled-It-%d.mat'), loop);
+% 		save(fileName, 'densityField_');
+% 		fileName = sprintf(strcat('./images/', 'sensitivityField-It-%d.mat'), loop);
+% 		save(fileName, 'sensitivityField_');	
+% 	end
 end
 
 
