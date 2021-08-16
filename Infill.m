@@ -116,7 +116,6 @@ if preprocessOpt
 	thickness = 2; %%thickness of the pre-embedded element bands
 	preEmbeddedElements = TensorTopoBasedPreProcess(U,nelx,nely,edofMat,E0,nu,thickness);
 	x(preEmbeddedElements) = 1;
-return	
 end
 xTilde = x;
 xPhys = (tanh(beta*eta) + tanh(beta*(xTilde-eta))) / (tanh(beta*eta) + tanh(beta*(1-eta)));
