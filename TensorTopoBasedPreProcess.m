@@ -69,7 +69,7 @@ function InitializeMeshInfo(nelx,nely,edofMat)
 	elementsOnBoundary_ = find(tmp>0);
 	
 	%%Only for the Specific 'Rectangle' Design Domain
-	%%Further Work Needed when Considering Random Shapes
+	%%Further Work Needed when Considering Arbitrary Shapes (Refer to './additional datasets/DataInspector.m')
 	meshState_ = ones(numEles_,1);
 	carEleMapBack_ = (1:numEles_)';
 	carEleMapForward_ = (1:numEles_)';
@@ -594,50 +594,73 @@ function [phyCoordList, eleIndexList, principalStressList] = TracingPSL(nextPoin
 	
 	phyCoordList = zeros(limiSteps,2);
 	eleIndexList = zeros(limiSteps,1);
-	principalStressList = zeros(limiSteps,6);	
+	principalStressList = zeros(limiSteps,6);
+	index = 0;	
 	
-	%%initialize initial k1 and k2
-	k1 = iniDir;
-	iniPot = nextPoint - k1*tracingStepWidth_;
-	midPot = nextPoint - k1*tracingStepWidth_/2;
-	index = 0;
-		
-	[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(midPot);
-	if bool1
-		cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
-		shapeFuncs = ShapeFunction(paraCoordinates(1), paraCoordinates(2));
-		cartesianStressOnGivenPoint = shapeFuncs*cartesianStress;
-		principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
-		k2 = DirectionSelecting(k1, principalStress(typePSL), -principalStress(typePSL));
-		nextPoint = iniPot + tracingStepWidth_*k2;
-		[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);
-		while 1==bool1
-			index = index + 1; if index > limiSteps, index = index-1; break; end
-			%%k1
-			cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
-			shapeFuncs = ShapeFunction(paraCoordinates(1), paraCoordinates(2));
-			cartesianStressOnGivenPoint = shapeFuncs*cartesianStress;
-			principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);					
-			k1 = DirectionSelecting(iniDir, principalStress(typePSL), -principalStress(typePSL));	
-			if 0 == AngleTerminationCondition(iniDir, k1), index = index-1; break; end
-			%%k2
-			midPot = nextPoint + k1*tracingStepWidth_/2;
-			[elementIndex2, paraCoordinates2, bool1] = FindAdjacentElement(midPot);
-			if ~bool1, index = index-1; break; end
-			cartesianStress2 = cartesianStressField_(eNodMat_(elementIndex2,:)', :);
-			shapeFuncs = ShapeFunction(paraCoordinates2(1), paraCoordinates2(2));
-			cartesianStressOnGivenPoint2 = shapeFuncs*cartesianStress2;
-			principalStress2 = ComputePrincipalStress(cartesianStressOnGivenPoint2);
-			k2 = DirectionSelecting(k1, principalStress2(typePSL), -principalStress2(typePSL));		
-			%%store	
-			iniDir = k1;
-			phyCoordList(index,:) = nextPoint;
-			eleIndexList(index,:) = elementIndex;
-			principalStressList(index,:) = principalStress;	
-			%%next point
-			nextPoint = nextPoint + tracingStepWidth_*k2;		
+	intgerScheme = 'RK2'; %% 'RK2', 'EULER'
+	switch intgerScheme		
+		case 'EULER'
 			[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);
-		end		
+			while 1==bool1
+				index = index + 1; if index > limiSteps, index = index-1; break; end
+				cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
+				shapeFuncs = ShapeFunction(paraCoordinates(1), paraCoordinates(2));
+				cartesianStressOnGivenPoint = shapeFuncs*cartesianStress;
+				principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);					
+				nextDir = DirectionSelecting(iniDir, principalStress(typePSL), -principalStress(typePSL));
+					
+				if 0 == AngleTerminationCondition(iniDir, nextDir), index = index-1; break; end	
+				iniDir = nextDir;
+				phyCoordList(index,:) = nextPoint;
+				eleIndexList(index,:) = elementIndex;
+				principalStressList(index,:) = principalStress;					
+				nextPoint = nextPoint + tracingStepWidth_*iniDir;
+				[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);
+			end				
+		case 'RK2'
+			%%initialize initial k1 and k2
+			k1 = iniDir;
+			iniPot = nextPoint - k1*tracingStepWidth_;
+			midPot = nextPoint - k1*tracingStepWidth_/2;
+			
+				
+			[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(midPot);
+			if bool1
+				cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
+				shapeFuncs = ShapeFunction(paraCoordinates(1), paraCoordinates(2));
+				cartesianStressOnGivenPoint = shapeFuncs*cartesianStress;
+				principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
+				k2 = DirectionSelecting(k1, principalStress(typePSL), -principalStress(typePSL));
+				nextPoint = iniPot + tracingStepWidth_*k2;
+				[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);
+				while 1==bool1
+					index = index + 1; if index > limiSteps, index = index-1; break; end
+					%%k1
+					cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
+					shapeFuncs = ShapeFunction(paraCoordinates(1), paraCoordinates(2));
+					cartesianStressOnGivenPoint = shapeFuncs*cartesianStress;
+					principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);					
+					k1 = DirectionSelecting(iniDir, principalStress(typePSL), -principalStress(typePSL));	
+					if 0 == AngleTerminationCondition(iniDir, k1), index = index-1; break; end
+					%%k2
+					midPot = nextPoint + k1*tracingStepWidth_/2;
+					[elementIndex2, paraCoordinates2, bool1] = FindAdjacentElement(midPot);
+					if ~bool1, index = index-1; break; end
+					cartesianStress2 = cartesianStressField_(eNodMat_(elementIndex2,:)', :);
+					shapeFuncs = ShapeFunction(paraCoordinates2(1), paraCoordinates2(2));
+					cartesianStressOnGivenPoint2 = shapeFuncs*cartesianStress2;
+					principalStress2 = ComputePrincipalStress(cartesianStressOnGivenPoint2);
+					k2 = DirectionSelecting(k1, principalStress2(typePSL), -principalStress2(typePSL));		
+					%%store	
+					iniDir = k1;
+					phyCoordList(index,:) = nextPoint;
+					eleIndexList(index,:) = elementIndex;
+					principalStressList(index,:) = principalStress;	
+					%%next point
+					nextPoint = nextPoint + tracingStepWidth_*k2;		
+					[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);
+				end		
+			end		
 	end
 	phyCoordList = phyCoordList(1:index,:);
 	eleIndexList = eleIndexList(1:index,:);
