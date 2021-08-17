@@ -61,10 +61,21 @@ elseif iLoad == 5 %% fig. 1
     Fsparse(2*(nely+1)*(nelx)+nely+1,1) = 1;
     Fsparse(2*(nely+1)*(nelx/2+1),1) = -1;
     fixeddofs = union([1:1:2*(nely+1)],[1]);
-elseif iLoad == 6 %% fig. 1
-    fixeddofs = [nely+1, nely+2, 2*(nelx+1)*(nely+1)-(nely+1)];
-    Fsparse([1 3 5 2*(nely+1)+1 4*(nely+1)+1 4*(nely+1)+2],1) = -1;
-    Fsparse([1 2 3 4 5 6 2*(nely+1)+1 2*(nely+1)+2 4*(nely+1)+1 4*(nely+1)+2],1) = 1;
+elseif iLoad == 6 %% fig. 8
+    iForce = sqrt(2)/2/5;
+	fixeddofs = [nely+1, nely+2, 2*(nelx+1)*(nely+1)-(nely+1)];
+	iNodeLoaded = [1 2 3 (nely+1)+1 2*(nely+1)+1];
+    Fsparse(2*(iNodeLoaded-1)+1,1) = -iForce;
+    Fsparse(2*iNodeLoaded,1) = iForce;	
+	iNodeLoaded = [nely+1 nely nely-1 2*(nely+1) 3*(nely+1)];
+    Fsparse(2*(iNodeLoaded-1)+1,1) = -iForce;
+    Fsparse(2*iNodeLoaded,1) = -iForce;	
+	iNodeLoaded = [(nely+1)*(nelx+1) (nely+1)*nely (nely+1)*(nely-1) (nely+1)*(nelx+1)-1 (nely+1)*(nelx+1)-2];
+    Fsparse(2*(iNodeLoaded-1)+1,1) = iForce;
+    Fsparse(2*iNodeLoaded,1) = -iForce;	
+	iNodeLoaded = [(nely+1)*nelx+1 (nely+1)*nelx+2 (nely+1)*nelx+3 (nely+1)*(nelx-1)+1 (nely+1)*(nelx-2)+1];
+    Fsparse(2*(iNodeLoaded-1)+1,1) = iForce;
+    Fsparse(2*iNodeLoaded,1) = iForce;		
 end
 U = zeros(2*(nely+1)*(nelx+1),1);
 alldofs = [1:2*(nely+1)*(nelx+1)];
