@@ -16,13 +16,12 @@ function [c_hist, vol_hist, change_hist, sharp_hist, cons_hist] = Infill(nelx,ne
 close all;
 %mkdir('images');
 if ~exist('./images', 'dir'), mkdir('images'); end
-volfrac = 0.5;
+volfrac = 0.4;
 vol_max = 0.6;
 penal = 3;      % stiffness penalty
 p = 16;         % pNorm
 r_hat = 18;      % pNorm radius
 rmin = 4.5;     % density filter radius
-%rmin = max(1.6, r_hat/4); % density filter radius
 move = 0.01;    % limited move for the design variables
 beta = 1;       % beta continuation
 eta = 0.5;      % projection threshold, fixed at 0.5
@@ -58,10 +57,14 @@ elseif iLoad == 2
 elseif iLoad == 3
     Fsparse(2*(nely+1)*(nelx)+nely+2,1) = -1;
     fixeddofs = union([1:1:2*(nely+1)],[1]);
-elseif iLoad == 5
+elseif iLoad == 5 %% fig. 1
     Fsparse(2*(nely+1)*(nelx)+nely+1,1) = 1;
     Fsparse(2*(nely+1)*(nelx/2+1),1) = -1;
-    fixeddofs = union([1:1:2*(nely+1)],[1]);    
+    fixeddofs = union([1:1:2*(nely+1)],[1]);
+elseif iLoad == 6 %% fig. 1
+    fixeddofs = [nely+1, nely+2, 2*(nelx+1)*(nely+1)-(nely+1)];
+    Fsparse([1 3 5 2*(nely+1)+1 4*(nely+1)+1 4*(nely+1)+2],1) = -1;
+    Fsparse([1 2 3 4 5 6 2*(nely+1)+1 2*(nely+1)+2 4*(nely+1)+1 4*(nely+1)+2],1) = 1;
 end
 U = zeros(2*(nely+1)*(nelx+1),1);
 alldofs = [1:2*(nely+1)*(nelx+1)];
