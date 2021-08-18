@@ -69,7 +69,7 @@ function InitializeMeshInfo(nelx,nely,edofMat)
 	elementsOnBoundary_ = find(tmp>0);
 	
 	%%Only for the Specific 'Rectangle' Design Domain
-	%%Further Work Needed when Considering Arbitrary Shapes (Refer to './additional datasets/DataInspector.m')
+	%%Further Work Needed when Considering Arbitrary Shapes
 	meshState_ = ones(numEles_,1);
 	carEleMapBack_ = (1:numEles_)';
 	carEleMapForward_ = (1:numEles_)';
