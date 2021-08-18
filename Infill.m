@@ -218,12 +218,13 @@ while change > 0.0001 && loop < nloop
 
     change = max(abs(xnew(:)-x(:)));
     x = xnew;
-
+	iSharp = 4*sum(sum(xPhys.*(ones(nely, nelx)-xPhys))) / (nely*nelx);
     %% PRINT RESULTS
-    disp([' It.: ' sprintf('%4i',loop) ' Obj.: ' sprintf('%10.4f',c) ...
-        ' Vol.: ' sprintf('%6.3f',sum(sum(xPhys))/(nelx*nely)) ...
-        ' Ch.: ' sprintf('%6.3f',change) ...
-        ' Cons.: ' sprintf('%6.3f',fval)]);
+    disp([' It.: ' sprintf('%4i',loop) ' Obj.: ' sprintf('%10.4e',c) ...
+        ' Vol.: ' sprintf('%10.4e',sum(sum(xPhys))/(nelx*nely)) ...
+        ' Ch.: ' sprintf('%10.4e',change) ...
+		' Sharp.: ' sprintf('%10.4e',iSharp) ...
+        ' Cons.: ' sprintf('%10.4e',fval)]);
 
     %% UPDATE HEAVISIDE REGULARIZATION PARAMETER
     if beta < 100 && (loopbeta >= 40 || change <= 0.001)
@@ -238,7 +239,7 @@ while change > 0.0001 && loop < nloop
     vol_hist(loop,1) = sum(sum(xPhys))/(nelx*nely);
     change_hist(loop,1) = change;
     cons_hist(loop,:) = fval;
-    sharp_hist(loop,1) = 4*sum(sum(xPhys.*(ones(nely, nelx)-xPhys))) / (nely*nelx);
+    sharp_hist(loop,1) = iSharp;
 
     %% PLOT DENSITIES
     figure(1);
