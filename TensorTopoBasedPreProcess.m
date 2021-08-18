@@ -1,3 +1,6 @@
+%% This code is created for performing the topology analysis to the stress tensor field simulated on the Cartesian mesh 
+% Author: Junpeng Wang (junpeng.wang@tum.de)
+% Version: 2021-08-05
 function preEmbeddedElements = TensorTopoBasedPreProcess(U,nelx,nely,edofMat,E0,nu,thickness)
 	preEmbeddedElements = [];
 	
@@ -597,7 +600,7 @@ function [phyCoordList, eleIndexList, principalStressList] = TracingPSL(nextPoin
 	principalStressList = zeros(limiSteps,6);
 	index = 0;	
 	
-	intgerScheme = 'RK2'; %% 'RK2', 'EULER'
+	intgerScheme = 'EULER'; %% 'RK2', 'EULER'
 	switch intgerScheme		
 		case 'EULER'
 			[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);
@@ -768,7 +771,6 @@ function oEleList = RelateAdjacentElements(iEleList)
 	%%	1	4	7
 	%%	2	5*	8
 	%%	3	6	9
-	%%[eleX, eleY] = NodalizeDesignDomain([nelx_-1 nely_-1], [1 1; nelx_ nely_]);
 	nx = nelx_-1; ny = nely_-1;
 	dd = [1 1; nelx_ nely_];
 	xSeed = dd(1,1):(dd(2,1)-dd(1,1))/nx:dd(2,1);

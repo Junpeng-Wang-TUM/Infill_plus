@@ -4,9 +4,17 @@
 % Adapted by Junpeng Wang (junpeng.wang@tum.de)
 % Date: 2021-08-05
 
-% Example: 
-%	Original (without preprocess): Infill(500,250,[2],1000,0)
-%	New (with topology-guided preprocess): Infill(500,250,[2],1000,1)
+%% This code was created for the paper "Stress Topology-guided Initialization for Porous Infill Optimization" 
+%% 	by Junpeng Wang, Jun Wu and Rüdiger Westermann, 
+%% which was submitted to the journal of "Structural and Multidisciplinary Optimization manuscript" in August of 2021.
+
+% Examples: 
+%	without preprocess: 
+%	fig.1c -> Infill(500,250,[2],1000,0); %%iLoad = 5;
+%	fig.8c -> Infill(200,200,[1 2],1000,0); %%iLoad = 6;
+%	with topology-guided preprocess: 
+%	fig.6a -> Infill(500,250,[2],1000,1); %%iLoad = 5;
+%	fig.8d -> Infill(200,200,[1 2],1000,1); %%iLoad = 6;
 
 function [c_hist, vol_hist, change_hist, sharp_hist, cons_hist] = Infill(nelx,nely,mdof,nloop,preprocessOpt)
 %mdof[1,2]
