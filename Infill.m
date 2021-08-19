@@ -1,12 +1,20 @@
-% Function: Infill optimization
+% Function: Infill optimization (with the stress topology-guided initialization)
+
+%==========================================================================
 % Author: Jun Wu (j.wu-1@tudelft.nl)
 % Version: 2017-06-19
+% created for the Publication
+% Jun Wu, Niels Aage, Ruediger Westermann, Ole Sigmund, 
+% Infill Optimization for Additive Manufacturing -- Approaching Bone-like Porous Structures
+% IEEE Trans. on Visualization and Computer Graphics, 2017
+%%-------------------------------------------------------------------------------
+%%-------------------------------------------------------------------------------
 % Adapted by Junpeng Wang (junpeng.wang@tum.de)
-% Date: 2021-08-05
-
-%% This code was created for the paper "Stress Topology-guided Initialization for Porous Infill Optimization" 
-%% 	by Junpeng Wang, Jun Wu and Rüdiger Westermann, 
-%% which was submitted to the journal of "Structural and Multidisciplinary Optimization manuscript" in August of 2021.
+% Version: 2021-08-05
+% for the submission 
+% Junpeng Wang, Jun Wu and Rüdiger Westermann, 
+% "Stress Topology Analysis for Porous Infill Optimization" 
+% to the journal of "Structural and Multidisciplinary Optimization manuscript" in August of 2021.
 
 % Examples: 
 %	without preprocess: 
@@ -15,8 +23,9 @@
 %	with topology-guided preprocess: 
 %	fig.6a -> Infill(500,250,[2],1000,1); %%iLoad = 5;
 %	fig.8d -> Infill(200,200,[1 2],1000,1); %%iLoad = 6;
+%==========================================================================
 
-function [c_hist, vol_hist, change_hist, sharp_hist, cons_hist] = Infill(nelx,nely,mdof,nloop,preprocessOpt)
+function Infill(nelx,nely,mdof,nloop,preprocessOpt)
 %mdof[1,2]
 % 1 total volume
 % 2 upper bound
@@ -257,20 +266,6 @@ while change > 0.0001 && loop < nloop
 
     filename1 = sprintf('images\\rho-It%i.png',loop);
     saveas(1,filename1,'png');
-
-% 	if 0==mod(loop,50)
-% 		densityField_ = reshape(xPhys, numel(xPhys), 1);	
-% 		fileName = sprintf(strcat('./images/', 'materialFiled-It-%d.mat'), loop);
-% 		save(fileName, 'densityField_');
-% 		fileName = sprintf(strcat('./images/', 'sensitivityField-It-%d.mat'), loop);
-% 		save(fileName, 'sensitivityField_');	
-% 	end
 end
 
-
-% Publication
-% Jun Wu, Niels Aage, Ruediger Westermann, Ole Sigmund, 
-% Infill Optimization for Additive Manufacturing -- Approaching Bone-like Porous Structures
-% IEEE Trans. on Visualization and Computer Graphics, 2017
-
-% The code was developed based on the 110 line topology optiziation code, by E. Andreassen etc, 2011
+% ***The code was developed based on the 110 line topology optiziation code, by E. Andreassen etc, 2011***
