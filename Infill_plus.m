@@ -18,14 +18,14 @@
 
 % Examples: 
 %	without preprocess: 
-%	fig.1c -> Infill(500,250,[2],1000,0); %%iLoad = 5;
-%	fig.8c -> Infill(200,200,[1 2],1000,0); %%iLoad = 6;
+%	fig.1c -> Infill_plus(500,250,[2],1000,0); %%iLoad = 5;
+%	fig.8c -> Infill_plus(200,200,[1 2],1000,0); %%iLoad = 6;
 %	with topology-guided preprocess: 
-%	fig.6a -> Infill(500,250,[2],1000,1); %%iLoad = 5;
-%	fig.8d -> Infill(200,200,[1 2],1000,1); %%iLoad = 6;
+%	fig.6a -> Infill_plus(500,250,[2],1000,1); %%iLoad = 5;
+%	fig.8d -> Infill_plus(200,200,[1 2],1000,1); %%iLoad = 6;
 %==========================================================================
 
-function Infill(nelx,nely,mdof,nloop,preprocessOpt)
+function Infill_plus(nelx,nely,mdof,nloop,preprocessOpt)
 %mdof[1,2]
 % 1 total volume
 % 2 upper bound
