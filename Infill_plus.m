@@ -217,7 +217,6 @@ while change > 0.0001 && loop < nloop
     fval = zeros(2,1);
     fval(1,1) = sum(sum(xPhys)) / (nelx*nely*volfrac) - 1;
     fval(2,1) = (sum(x_pde_hat.^p))^(1/p)- vol_max_pNorm;
-    sensitivityField_ = -df0dx(:) ./ dfdx(mdof,:)';
 	
     a0 = 1;
     a = zeros(m,1);     
