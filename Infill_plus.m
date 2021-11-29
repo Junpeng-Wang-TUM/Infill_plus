@@ -104,18 +104,18 @@ jH = ones(size(iH));
 sH = zeros(size(iH));
 k = 0;
 for i1 = 1:nelx
-  for j1 = 1:nely
-    e1 = (i1-1)*nely+j1;
-    for i2 = max(i1-(ceil(rmin)-1),1):min(i1+(ceil(rmin)-1),nelx)
-      for j2 = max(j1-(ceil(rmin)-1),1):min(j1+(ceil(rmin)-1),nely)
-        e2 = (i2-1)*nely+j2;
-        k = k+1;
-        iH(k) = e1;
-        jH(k) = e2;
-        sH(k) = max(0,rmin-sqrt((i1-i2)^2+(j1-j2)^2));
-      end
-    end
-  end
+	for j1 = 1:nely
+		e1 = (i1-1)*nely+j1;
+		for i2 = max(i1-(ceil(rmin)-1),1):min(i1+(ceil(rmin)-1),nelx)
+			for j2 = max(j1-(ceil(rmin)-1),1):min(j1+(ceil(rmin)-1),nely)
+				e2 = (i2-1)*nely+j2;
+				k = k+1;
+				iH(k) = e1;
+				jH(k) = e2;
+				sH(k) = max(0,rmin-sqrt((i1-i2)^2+(j1-j2)^2));
+			end
+		end
+	end
 end
 H = sparse(iH,jH,sH);
 Hs = sum(H,2);
@@ -141,13 +141,16 @@ LF = chol(KF,'lower');
 x = repmat(volfrac,nely,nelx);
 %% STRESS TENSOR TOPOLOGY BASED PRE-PROCESS
 if preprocessOpt
-    sK = reshape(KE(:)*(Emin+ones(1,nelx*nely).^penal*(E0-Emin)),64*nelx*nely,1);
+    iniStart = tic;
+	sK = reshape(KE(:)*(Emin+ones(1,nelx*nely).^penal*(E0-Emin)),64*nelx*nely,1);
     K = sparse(iK,jK,sK); K = (K+K')/2; 
     U(freedofs) = K(freedofs,freedofs)\Fsparse(freedofs);
 	thickness = 2; %%thickness of the pre-embedded element bands
 	preEmbeddedElements = TensorTopoBasedPreProcess(U,nelx,nely,edofMat,E0,nu,thickness);
 	x(preEmbeddedElements) = 1;
+	disp(['Perform Initialization Costs: ' sprintf('%10.3g',toc(iniStart)) 's']);
 end
+
 xTilde = x;
 xPhys = (tanh(beta*eta) + tanh(beta*(xTilde-eta))) / (tanh(beta*eta) + tanh(beta*(1-eta)));
 xold1 = reshape(x,[nely*nelx,1]);
